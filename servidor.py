@@ -5,7 +5,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6abcdef123456'  # Mude para algo seguro e único
+app.secret_key = os.environ.get('SECRET_KEY', 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6')  # Use variável de ambiente no Render
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -22,11 +22,11 @@ class AdminUser(UserMixin):
     def __init__(self, username):
         self.id = username
 
-# Credenciais de admin (ALTERE AQUI: edite esses valores diretamente no código)
-ADMIN_USERNAME = 'admin'  # Altere para o usuário desejado
-ADMIN_PASSWORD = 'senhafoda'  # Altere para a senha desejada (será hasheada automaticamente)
+# Credenciais de admin
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'senhafoda')
 
-# Hash da senha (feito automaticamente)
+# Hash da senha
 admin_pass_hash = generate_password_hash(ADMIN_PASSWORD)
 
 @login_manager.user_loader
@@ -57,7 +57,7 @@ def download_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
 # Rotas admin
-@app.route('/admin/login', methods=['GET', 'POST'])  # CORRIGIDO: Agora exibe templates/admin_login.html
+@app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
         username = request.form['username']
@@ -79,7 +79,7 @@ def admin_logout():
 @login_required
 def admin_files():
     files = os.listdir(app.config['UPLOAD_FOLDER'])
-    return render_template('admin_files.html', files=files)  # Exibe templates/admin_files.html
+    return render_template('admin_files.html', files=files)
 
 @app.route('/admin/delete/<filename>')
 @login_required
@@ -93,5 +93,4 @@ def admin_delete(filename):
     return redirect(url_for('admin_files'))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
