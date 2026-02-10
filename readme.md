@@ -5,7 +5,7 @@
 
 ###
 
-<h1 align="center">VOID CLOUD</h1>
+<h1 align="center">VOID CLOUD 🦇</h1>
 
 ###
 
